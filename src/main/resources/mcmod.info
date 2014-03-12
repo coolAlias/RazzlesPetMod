@@ -1,0 +1,16 @@
+[
+{
+  "modid": "razzlespetmod",
+  "name": "Razzle's Pet Mod",
+  "description": "A mod that adds pets with changeable models",
+  "version": "1.6.4-0.1.0",
+  "mcversion": "1.6.4",
+  "url": "",
+  "updateUrl": "",
+  "authors": ["coolAlias, RazzleberryFox"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
