@@ -1,6 +1,7 @@
 package razzlespetmod.api;
 
-import net.minecraft.client.model.ModelBase;
+import net.minecraft.entity.EntityOwnable;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -10,8 +11,36 @@ import cpw.mods.fml.relauncher.SideOnly;
  * This will be an interface for all pets, providing methods for current model, size, etc.
  *
  */
-public interface IEntityPet {
-	
+public interface IEntityPet extends EntityOwnable {
+
+	/**
+	 * Return true if this itemstack can be used to swap models when interacting with the pet
+	 */
+	public boolean isPetItem(ItemStack stack);
+
+	/**
+	 * Called upon interacting with a pet item; should change the current model - recommended to
+	 * use DataWatcher to store the current model data for easy server-client synchronization
+	 * Rescales the entity's hit box based on the new height and width for the current model
+	 */
+	public void changeModel();
+
+	/**
+	 * Returns the current height for the entity; used to rescale the hit-box upon changing models 
+	 */
+	public float getCurrentHeight();
+
+	/**
+	 * Returns the current width for the entity; used to rescale the hit-box upon changing models 
+	 */
+	public float getCurrentWidth();
+
+	/**
+	 * Returns the current shadow size for rendering
+	 */
+	@SideOnly(Side.CLIENT)
+	public float getCurrentShadowSize();
+
 	/**
 	 * Whether the entity should render this pass; this can also be used to set various
 	 * openGL settings, such as color, alpha blend, etc.
@@ -28,18 +57,37 @@ public interface IEntityPet {
 	public float getRenderScale();
 
 	/**
-	 * Returns the main model this pet will use for rendering; models should all be initialized
-	 * and referenced statically to avoid creating new models each time
+	 * Whether this pet should use the default rotation float defined in RendererLivingEntity
+	 * or will define the rotation float itself using getRotationFloat
+	 * @return true to use the default value
 	 */
 	@SideOnly(Side.CLIENT)
-	public ModelBase getMainModel();
-	
+	public boolean useDefaultRotationFloat();
+
 	/**
-	 * Returns an alternate model for the render pass; used by pigs and wolves, for example,
-	 * to render saddled / collared versions (I think...)
+	 * Defines what float the third param in setRotationAngles of ModelBase is; wolves, for
+	 * example, return the current tail rotation for use in the Model class
+	 * NOTE that this is only used if useDefaultRotationFloat returns false
+	 * @param partialTick TODO pretty sure this parameter is partialTick
 	 */
 	@SideOnly(Side.CLIENT)
-	public ModelBase getModelForRenderpass();
+	public float getRotationFloat(float partialTick);
+
+	/**
+	 * Returns the index of the main model currently in use; indices are based on the order in
+	 * which models were added to the RenderIEntityPet constructor
+	 */
+	@SideOnly(Side.CLIENT)
+	public int getMainModelIndex();
+
+	/**
+	 * Returns the index of the model to be used for the current render pass, if any; indices are
+	 * based on the order in which models were added to the RenderIEntityPet constructor
+	 * Pigs and wolves, for example, return an alternate model to render saddled / collared versions
+	 * @return -1 to not use any alternate model
+	 */
+	@SideOnly(Side.CLIENT)
+	public int getRenderPassModelIndex();
 
 	/**
 	 * Returns the texture to be used by this pet; this should be done using pre-initialized
@@ -47,7 +95,7 @@ public interface IEntityPet {
 	 */
 	@SideOnly(Side.CLIENT)
 	public ResourceLocation getTexture();
-	
+
 	/**
 	 * Can return an alternate texture based on render pass and partial tick, or null if the
 	 * main texture should be used. Pigs, for example, use this to render the saddled texture
