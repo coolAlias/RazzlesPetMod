@@ -37,15 +37,13 @@ public class RenderIEntityPet extends RenderLiving
 	 * 
 	 * @param model the main model; added automatically as the first entry in the model list
 	 * @param shadowSize shadow size for the main model
-	 * @param args any further models to be used should be passed here
+	 * @param models any further models to be used should be passed here
 	 */
-	public RenderIEntityPet(ModelBase model, float shadowSize, Object... args) {
+	public RenderIEntityPet(ModelBase model, float shadowSize, ModelBase... models) {
 		super(model, shadowSize);
-		models.add(model);
-		for (Object o : args) {
-			if (o instanceof ModelBase) {
-				models.add((ModelBase) o);
-			}
+		this.models.add(model);
+		for (ModelBase m : models) {
+			this.models.add(m);
 		}
 	}
 
